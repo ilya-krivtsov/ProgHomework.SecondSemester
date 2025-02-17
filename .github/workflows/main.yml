@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push
+
+jobs:
+  build:
+    name: build-${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Build
+      if: runner.os == 'Windows'
+      run: ./build.ps1 build
+    - name: Build
+      if: runner.os == 'Linux'
+      run: ./build.sh build
+
+  test:
+    name: test-${{ matrix.os }}
+    needs: [ build ]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Test
+      if: runner.os == 'Windows'
+      run: ./build.ps1 test
+    - name: Test
+      if: runner.os == 'Linux'
+      run: ./build.sh test
