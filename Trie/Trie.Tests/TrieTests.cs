@@ -11,6 +11,8 @@ public class TrieTests
         "ABCD"
     ];
 
+    private static readonly string[][] TestStringsSet = [TestStrings, GenerateRandomStrings()];
+
     private Trie trie;
 
     [SetUp]
@@ -32,19 +34,19 @@ public class TrieTests
     }
 
     [Test]
-    public void TrieAdd_And_TrieRemove_ReturnsCorrectly_MultipleValues()
+    public void TrieAdd_And_TrieRemove_ReturnsCorrectly_MultipleValues([ValueSource(nameof(TestStringsSet))] string[] strings)
     {
-        for (int i = 0; i < TestStrings.Length; i++)
+        for (int i = 0; i < strings.Length; i++)
         {
-            var item = TestStrings[i];
+            var item = strings[i];
             Assert.That(() => trie.Add(item), Is.True);
             Assert.That(() => trie.Add(item), Is.False);
             Assert.That(trie.Size, Is.EqualTo(i + 1));
         }
 
-        for (int i = TestStrings.Length - 1; i >= 0; i--)
+        for (int i = strings.Length - 1; i >= 0; i--)
         {
-            var item = TestStrings[i];
+            var item = strings[i];
             Assert.That(() => trie.Remove(item), Is.True);
             Assert.That(() => trie.Remove(item), Is.False);
             Assert.That(trie.Size, Is.EqualTo(i));
@@ -79,5 +81,28 @@ public class TrieTests
         }
 
         Assert.That(() => trie.HowManyStartsWithPrefix("random_prefix"), Is.Zero);
+    }
+
+    private static string[] GenerateRandomStrings()
+    {
+        int seed = 375638473;
+        var random = new Random(seed);
+
+        int stringCount = 16;
+        int stringLength = 256;
+        string[] strings = new string[stringCount];
+        Span<char> buffer = stackalloc char[stringLength];
+
+        for (int i = 0; i < stringCount; i++)
+        {
+            for (int j = 0; j < stringLength; j++)
+            {
+                buffer[j] = (char)random.Next(' ', '~' + 1);
+            }
+
+            strings[i] = new(buffer);
+        }
+
+        return strings;
     }
 }
