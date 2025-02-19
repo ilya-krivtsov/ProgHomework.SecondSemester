@@ -38,7 +38,7 @@ public class Trie
     }
 
     /// <summary>
-    /// asa.
+    /// Checks if this trie contains <paramref name="item"/>.
     /// </summary>
     /// <param name="item">The string to seek.</param>
     /// <returns><see langword="true"/> if <paramref name="item"/> is present in trie, <see langword="false"/> otherwise.</returns>
