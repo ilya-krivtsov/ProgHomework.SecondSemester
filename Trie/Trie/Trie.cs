@@ -43,18 +43,7 @@ public class Trie
     /// <param name="item">The string to seek.</param>
     /// <returns><see langword="true"/> if <paramref name="item"/> is present in trie, <see langword="false"/> otherwise.</returns>
     public bool Contains(string item)
-    {
-        var lastNode = rootNode;
-        foreach (var character in item)
-        {
-            if (!lastNode.TryGetChild(character, out lastNode))
-            {
-                return false;
-            }
-        }
-
-        return lastNode.EndOfWord;
-    }
+        => GetNode(item, out var node) && node.EndOfWord;
 
     /// <summary>
     /// Removes <paramref name="item"/> from this trie.
@@ -63,21 +52,12 @@ public class Trie
     /// <returns><see langword="true"/> if <paramref name="item"/> was present in trie before removing it, <see langword="false"/> otherwise.</returns>
     public bool Remove(string item)
     {
-        var lastNode = rootNode;
-        foreach (var character in item)
-        {
-            if (!lastNode.TryGetChild(character, out lastNode))
-            {
-                return false;
-            }
-        }
-
-        if (!lastNode.EndOfWord)
+        if (!GetNode(item, out var node) || node.EndOfWord == false)
         {
             return false;
         }
 
-        lastNode.RemoveSelf();
+        node.RemoveSelf();
 
         return true;
     }
@@ -88,17 +68,20 @@ public class Trie
     /// <param name="prefix">Prefix to check against.</param>
     /// <returns>Count of strings stored in this trie that start with <paramref name="prefix"/>.</returns>
     public int HowManyStartsWithPrefix(ReadOnlySpan<char> prefix)
+        => GetNode(prefix, out var node) ? node.TotalDescendants : 0;
+
+    private bool GetNode(ReadOnlySpan<char> prefix, [MaybeNullWhen(false)] out Node node)
     {
-        var lastNode = rootNode;
+        node = rootNode;
         foreach (var character in prefix)
         {
-            if (!lastNode.TryGetChild(character, out lastNode))
+            if (!node.TryGetChild(character, out node))
             {
-                return 0;
+                return false;
             }
         }
 
-        return lastNode.TotalDescendants;
+        return true;
     }
 
     private class Node
