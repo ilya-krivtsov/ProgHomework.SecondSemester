@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: build-${{ matrix.os }}
+    name: build-and-test-${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -24,21 +24,6 @@ jobs:
     - name: Build
       if: runner.os == 'Linux'
       run: ./build.sh build
-
-  test:
-    name: test-${{ matrix.os }}
-    needs: [ build ]
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
 
     - name: Test
       if: runner.os == 'Windows'
