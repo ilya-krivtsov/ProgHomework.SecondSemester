@@ -1,7 +1,5 @@
 namespace Zipper;
 
-using System.Diagnostics;
-
 /// <summary>
 /// Reads integers of arbitrary width.
 /// </summary>
@@ -39,7 +37,7 @@ internal class ArbitraryBitReader
         int remainingWidth = width;
         while (remainingWidth > 0)
         {
-            if (bitsReadFromBuffer is null or 0 or >= 8)
+            if (bitsReadFromBuffer is null or >= 8)
             {
                 int readByte = stream.ReadByte();
                 if (readByte == -1)

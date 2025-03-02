@@ -1,7 +1,5 @@
 namespace Zipper;
 
-using System.Diagnostics;
-
 /// <summary>
 /// Writes integers of arbitrary width.
 /// </summary>
@@ -25,7 +23,7 @@ internal class ArbitraryBitWriter : IDisposable
 
         this.stream = stream;
         this.width = width;
-        buffer = new byte[width * 8];
+        buffer = new byte[width];
         bitsWrittenInBuffer = 0;
     }
 
@@ -47,16 +45,21 @@ internal class ArbitraryBitWriter : IDisposable
             int bitsRemainingInCurrentByte = 8 - bitsWrittenToCurrentByte;
 
             int toWrite = number >> Math.Max(0, remainingWidth - bitsRemainingInCurrentByte);
-            int remainingWidthInCurrentByte = Math.Max(0, 8 - remainingWidth);
-            buffer[bufferOffset] |= (byte)(toWrite << remainingWidthInCurrentByte);
-
+            int previousRemainingWidth = remainingWidth;
             remainingWidth -= bitsRemainingInCurrentByte;
-            bitsWrittenInBuffer += bitsRemainingInCurrentByte - remainingWidthInCurrentByte;
+            remainingWidth = Math.Max(0, remainingWidth);
+
+            int bitsToBeWritten = previousRemainingWidth - remainingWidth;
+            int bitsToBeLeftInCurrentByte = bitsRemainingInCurrentByte - bitsToBeWritten;
+            buffer[bufferOffset] |= (byte)(toWrite << bitsToBeLeftInCurrentByte);
+            bitsWrittenInBuffer += bitsToBeWritten;
         }
 
-        if (bitsWrittenInBuffer == buffer.Length * 8)
+        if (bitsWrittenInBuffer >= buffer.Length * 8)
         {
             stream.Write(buffer);
+            Array.Clear(buffer);
+            bitsWrittenInBuffer = 0;
         }
     }
 
@@ -81,7 +84,7 @@ internal class ArbitraryBitWriter : IDisposable
 
         disposed = true;
 
-        if (disposing)
+        if (!disposing)
         {
             return;
         }
@@ -91,7 +94,7 @@ internal class ArbitraryBitWriter : IDisposable
             return;
         }
 
-        int bytesWrittenInBuffer = bitsWrittenInBuffer / 8;
-        stream.Write(buffer.AsSpan()[..(bytesWrittenInBuffer + 1)]);
+        int bytesWrittenInBuffer = (int)Math.Ceiling(bitsWrittenInBuffer / 8f);
+        stream.Write(buffer.AsSpan()[..bytesWrittenInBuffer]);
     }
 }
