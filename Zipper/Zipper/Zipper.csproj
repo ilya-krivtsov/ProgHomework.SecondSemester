@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="../Zipper/Zipper.Tests.csproj" />
+    <InternalsVisibleTo Include="Zipper.Tests" />
   </ItemGroup>
 
 </Project>
