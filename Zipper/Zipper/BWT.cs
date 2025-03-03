@@ -1,5 +1,6 @@
 namespace Zipper;
 
+using System.Buffers;
 using System.Diagnostics;
 
 /// <summary>
@@ -23,7 +24,7 @@ internal static class BWT
             return -1;
         }
 
-        Span<int> offsets = stackalloc int[length];
+        int[] offsets = ArrayPool<int>.Shared.Rent(length);
         for (int i = 0; i < length; i++)
         {
             offsets[i] = i;
@@ -44,7 +45,7 @@ internal static class BWT
             return 0;
         }
 
-        offsets.Sort(Compare);
+        Array.Sort(offsets, Compare);
 
         var inputSpan = input.Span;
         int? identityPosition = null;
@@ -57,6 +58,8 @@ internal static class BWT
 
             output[i] = inputSpan[(offsets[i] + length - 1) % length];
         }
+
+        ArrayPool<int>.Shared.Return(offsets);
 
         Debug.Assert(identityPosition.HasValue, "Identity position not found");
 
@@ -80,7 +83,7 @@ internal static class BWT
 
         int length = input.Length;
 
-        Span<int> appearances = stackalloc int[length];
+        int[] appearances = ArrayPool<int>.Shared.Rent(length);
         Span<int> lastAppearances = stackalloc int[256];
         Span<int> byteCounter = stackalloc int[256];
 
@@ -122,5 +125,7 @@ internal static class BWT
             lastByte = input[lastIdentityIndex];
             output[^(i + 1)] = lastByte;
         }
+
+        ArrayPool<int>.Shared.Return(appearances);
     }
 }
