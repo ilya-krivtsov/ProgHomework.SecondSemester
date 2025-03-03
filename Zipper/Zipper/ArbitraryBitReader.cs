@@ -29,7 +29,7 @@ internal class ArbitraryBitReader
     /// Reads number from underlying stream and stores it in the <paramref name="number"/>.
     /// </summary>
     /// <param name="number">When this method returns, contains the value that was read, if read successfully, zero otherwise.</param>
-    /// <returns><see langword="true"/> if <paramref name="number"/> was successfuly read, <see langword="true"/> otherwise.</returns>
+    /// <returns><see langword="true"/> if <paramref name="number"/> was successfuly read, <see langword="false"/> otherwise.</returns>
     public bool ReadNext(out uint number)
     {
         number = 0;
