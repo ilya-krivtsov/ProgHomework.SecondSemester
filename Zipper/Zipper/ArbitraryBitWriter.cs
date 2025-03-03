@@ -8,6 +8,7 @@ internal class ArbitraryBitWriter : IDisposable
     private readonly Stream stream;
     private readonly int width;
     private readonly byte[] buffer;
+    private readonly bool leaveOpen;
     private int bitsWrittenInBuffer;
     private bool disposed = false;
 
@@ -16,13 +17,15 @@ internal class ArbitraryBitWriter : IDisposable
     /// </summary>
     /// <param name="stream">Stream to write to.</param>
     /// <param name="width">Width of integers between 4 and 32 bits.</param>
-    public ArbitraryBitWriter(Stream stream, int width)
+    /// <param name="leaveOpen"><see langword="true"/> to leave the <paramref name="stream"/> open after disposing the <see cref="ArbitraryBitWriter"/> object, <see langword="false"/> otherwise.</param>
+    public ArbitraryBitWriter(Stream stream, int width, bool leaveOpen = false)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(width, 4, nameof(width));
         ArgumentOutOfRangeException.ThrowIfGreaterThan(width, 32, nameof(width));
 
         this.stream = stream;
         this.width = width;
+        this.leaveOpen = leaveOpen;
         buffer = new byte[width];
         bitsWrittenInBuffer = 0;
     }
@@ -57,10 +60,27 @@ internal class ArbitraryBitWriter : IDisposable
 
         if (bitsWrittenInBuffer >= buffer.Length * 8)
         {
-            stream.Write(buffer);
-            Array.Clear(buffer);
-            bitsWrittenInBuffer = 0;
+            Flush();
         }
+    }
+
+    /// <summary>
+    /// Flushes the internal buffer.
+    /// </summary>
+    public void Flush()
+    {
+        ObjectDisposedException.ThrowIf(disposed, this);
+
+        if (bitsWrittenInBuffer == 0)
+        {
+            return;
+        }
+
+        int bytesWrittenInBuffer = (int)Math.Ceiling(bitsWrittenInBuffer / 8f);
+        stream.Write(buffer.AsSpan()[..bytesWrittenInBuffer]);
+
+        Array.Clear(buffer);
+        bitsWrittenInBuffer = 0;
     }
 
     /// <summary>
@@ -82,19 +102,15 @@ internal class ArbitraryBitWriter : IDisposable
             return;
         }
 
-        disposed = true;
-
-        if (!disposing)
+        if (disposing)
         {
-            return;
-        }
+            Flush();
+            if (!leaveOpen)
+            {
+                stream.Dispose();
+            }
 
-        if (bitsWrittenInBuffer == 0)
-        {
-            return;
+            disposed = true;
         }
-
-        int bytesWrittenInBuffer = (int)Math.Ceiling(bitsWrittenInBuffer / 8f);
-        stream.Write(buffer.AsSpan()[..bytesWrittenInBuffer]);
     }
 }
