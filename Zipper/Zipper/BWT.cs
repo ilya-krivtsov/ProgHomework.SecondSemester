@@ -45,7 +45,9 @@ internal static class BWT
             return 0;
         }
 
-        Array.Sort(offsets, Compare);
+        var offsetsSpan = offsets.AsSpan(0, length);
+
+        offsetsSpan.Sort(Compare);
 
         var inputSpan = input.Span;
         int? identityPosition = null;
