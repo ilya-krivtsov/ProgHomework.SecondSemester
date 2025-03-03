@@ -28,4 +28,36 @@ public class TrieTests
     {
         trie = new();
     }
+
+    [Test]
+    public void TrieAdd_And_TrieTryGetValue_ReturnsCorrectly_SingleValue([ValueSource(nameof(TestStrings))] byte[] bytes)
+    {
+        TestAddValue(trie, bytes);
+    }
+
+    [Test]
+    public void TrieAdd_And_TrieTryGetValue_ReturnsCorrectly_MultipleValues([ValueSource(nameof(TestStringsSet))] byte[][] strings)
+    {
+        foreach (var bytes in strings)
+        {
+            TestAddValue(trie, bytes);
+        }
+    }
+
+    private static void TestAddValue(Trie trie, byte[] bytes)
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(trie.TryGetValue(bytes, out _), Is.False);
+
+            Assert.That(Add(trie, bytes), Is.True);
+            Assert.That(Add(trie, bytes), Is.False);
+
+            Assert.That(trie.TryGetValue(bytes, out int value), Is.True);
+            Assert.That(value, Is.EqualTo(bytes.Length));
+        });
+    }
+
+    private static bool Add(Trie trie, byte[] bytes)
+        => trie.Add(bytes, bytes.Length);
 }
