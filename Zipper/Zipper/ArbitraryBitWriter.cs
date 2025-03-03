@@ -77,7 +77,7 @@ internal class ArbitraryBitWriter : IDisposable
         }
 
         int bytesWrittenInBuffer = (int)Math.Ceiling(bitsWrittenInBuffer / 8f);
-        stream.Write(buffer.AsSpan()[..bytesWrittenInBuffer]);
+        stream.Write(buffer, 0, bytesWrittenInBuffer);
 
         Array.Clear(buffer);
         bitsWrittenInBuffer = 0;
