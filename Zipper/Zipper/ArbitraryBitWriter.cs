@@ -1,7 +1,7 @@
 namespace Zipper;
 
 /// <summary>
-/// Writes integers of arbitrary width.
+/// Writes unsigned integers of arbitrary width.
 /// </summary>
 internal class ArbitraryBitWriter : IDisposable
 {
@@ -31,11 +31,11 @@ internal class ArbitraryBitWriter : IDisposable
     /// Writes <paramref name="number"/> to the underlying stream.
     /// </summary>
     /// <param name="number">Number to write.</param>
-    public void Write(int number)
+    public void Write(uint number)
     {
         ObjectDisposedException.ThrowIf(disposed, this);
 
-        number &= (int)(0xFFFFFFFF >> (32 - width));
+        number &= 0xFFFFFFFF >> (32 - width);
 
         int remainingWidth = width;
         while (remainingWidth > 0)
@@ -44,7 +44,7 @@ internal class ArbitraryBitWriter : IDisposable
             int bitsWrittenToCurrentByte = bitsWrittenInBuffer % 8;
             int bitsRemainingInCurrentByte = 8 - bitsWrittenToCurrentByte;
 
-            int toWrite = number >> Math.Max(0, remainingWidth - bitsRemainingInCurrentByte);
+            uint toWrite = number >> Math.Max(0, remainingWidth - bitsRemainingInCurrentByte);
             int previousRemainingWidth = remainingWidth;
             remainingWidth -= bitsRemainingInCurrentByte;
             remainingWidth = Math.Max(0, remainingWidth);

@@ -26,7 +26,7 @@ public class ArbitraryBitReaderWriterTests
             {
                 Assert.Multiple(() =>
                 {
-                    Assert.That(reader.ReadNext(out int number), Is.True);
+                    Assert.That(reader.ReadNext(out uint number), Is.True);
                     Assert.That(number, Is.EqualTo(data.Numbers[i]));
                 });
             }
@@ -46,7 +46,7 @@ public class ArbitraryBitReaderWriterTests
             using var writer = new ArbitraryBitWriter(memory, width);
             for (int i = 0; i < numbersCount; i++)
             {
-                writer.Write(i * i);
+                writer.Write((uint)(i * i));
             }
         }
 
@@ -57,7 +57,7 @@ public class ArbitraryBitReaderWriterTests
             {
                 Assert.Multiple(() =>
                 {
-                    Assert.That(reader.ReadNext(out int number), Is.True);
+                    Assert.That(reader.ReadNext(out uint number), Is.True);
                     Assert.That(number, Is.EqualTo(i * i));
                 });
             }
@@ -78,12 +78,12 @@ public class ArbitraryBitReaderWriterTests
         for (int i = 0; i < result.Length; i++)
         {
             int width = i + minWidth;
-            int upperBound = (int)Math.Min(1ul << width, int.MaxValue);
+            long upperBound = 1L << width;
 
-            var numbers = new int[numbersLength];
+            var numbers = new uint[numbersLength];
             for (int j = 0; j < numbersLength; j++)
             {
-                numbers[j] = random.Next(upperBound);
+                numbers[j] = (uint)random.NextInt64(upperBound);
             }
 
             result[i] = new(width, numbers);
@@ -92,5 +92,5 @@ public class ArbitraryBitReaderWriterTests
         return result;
     }
 
-    public readonly record struct TestData(int Width, int[] Numbers);
+    public readonly record struct TestData(int Width, uint[] Numbers);
 }
