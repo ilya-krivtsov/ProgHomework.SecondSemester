@@ -5,6 +5,24 @@ public class ArbitraryBitReaderWriterTests
     private static readonly TestData[] TestDataSource = GenerateData();
 
     [Test]
+    public void ReaderAndWriter_ShouldThrowIf_InitializedWith_Width_InDisallowedRange()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ArbitraryBitReader(Stream.Null, ArbitraryBitReader.MinWidth - 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ArbitraryBitReader(Stream.Null, ArbitraryBitReader.MaxWidth + 1));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ArbitraryBitWriter(Stream.Null, ArbitraryBitWriter.MinWidth - 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ArbitraryBitWriter(Stream.Null, ArbitraryBitWriter.MaxWidth + 1));
+    }
+
+    [Test]
+    public void Reader_ShouldThrowIf_StreamCanNotRead()
+        => Assert.Throws<ArgumentException>(() => new ArbitraryBitReader(new TestStream(), ArbitraryBitReader.MinWidth));
+
+    [Test]
+    public void Writer_ShouldThrowIf_StreamCanNotWrite()
+        => Assert.Throws<ArgumentException>(() => new ArbitraryBitWriter(new TestStream(), ArbitraryBitWriter.MinWidth));
+
+    [Test]
     public void Reader_ShouldReadValues_WrittenBy_Writer_Correctly([ValueSource(nameof(TestDataSource))] TestData data)
     {
         int memorySize = (int)Math.Ceiling(data.Width * data.Numbers.Length / 8f);
@@ -93,4 +111,12 @@ public class ArbitraryBitReaderWriterTests
     }
 
     public readonly record struct TestData(int Width, uint[] Numbers);
+
+    // use MemoryStream, because implementing all Stream's abstract membrers leads to bad code coverage
+    private class TestStream : MemoryStream
+    {
+        public override bool CanRead => false;
+
+        public override bool CanWrite => false;
+    }
 }
