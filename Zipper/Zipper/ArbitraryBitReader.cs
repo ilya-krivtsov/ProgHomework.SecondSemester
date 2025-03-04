@@ -26,6 +26,11 @@ internal class ArbitraryBitReader
         ArgumentOutOfRangeException.ThrowIfLessThan(width, MinWidth, nameof(width));
         ArgumentOutOfRangeException.ThrowIfGreaterThan(width, MaxWidth, nameof(width));
 
+        if (!stream.CanRead)
+        {
+            throw new ArgumentException("Stream does not support reading", nameof(stream));
+        }
+
         this.stream = stream;
         this.width = width;
         bitsReadFromBuffer = null;
