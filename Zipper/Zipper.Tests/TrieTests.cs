@@ -53,11 +53,11 @@ public class TrieTests
             Assert.That(Add(trie, bytes), Is.True);
             Assert.That(Add(trie, bytes), Is.False);
 
-            Assert.That(trie.TryGetValue(bytes, out int value), Is.True);
+            Assert.That(trie.TryGetValue(bytes, out uint value), Is.True);
             Assert.That(value, Is.EqualTo(bytes.Length));
         });
     }
 
     private static bool Add(Trie trie, byte[] bytes)
-        => trie.Add(bytes, bytes.Length);
+        => trie.Add(bytes, (uint)bytes.Length);
 }

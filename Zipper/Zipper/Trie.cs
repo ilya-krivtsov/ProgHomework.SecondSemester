@@ -15,7 +15,7 @@ public class Trie
     /// <param name="key">The byte sequence to as key.</param>
     /// <param name="value">The number to add as value.</param>
     /// <returns><see langword="true"/> if <paramref name="key"/> wasn't present in trie before adding it, <see langword="false"/> otherwise.</returns>
-    public bool Add(ReadOnlySpan<byte> key, int value)
+    public bool Add(ReadOnlySpan<byte> key, uint value)
     {
         var lastNode = rootNode;
         foreach (var character in key)
@@ -42,7 +42,7 @@ public class Trie
     /// When this method returns, contains the value associated with <paramref name="key"/>, if <paramref name="key"/> is found, zero otherwise.
     /// </param>
     /// <returns><see langword="true"/> if <paramref name="key"/> is found, <see langword="false"/> otherwise.</returns>
-    public bool TryGetValue(ReadOnlySpan<byte> key, out int value)
+    public bool TryGetValue(ReadOnlySpan<byte> key, out uint value)
     {
         var nodeExistsAndHasValue = GetNode(key, out var node) && node.EndOfWord;
 
@@ -71,7 +71,7 @@ public class Trie
 
         public bool EndOfWord { get; set; }
 
-        public int Value { get; set; }
+        public uint Value { get; set; }
 
         public Node GetOrCreateChild(byte value)
         {
