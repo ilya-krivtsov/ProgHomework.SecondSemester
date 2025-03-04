@@ -5,6 +5,16 @@ namespace Zipper;
 /// </summary>
 internal class ArbitraryBitWriter : IDisposable
 {
+    /// <summary>
+    /// Smallest allowed width of numbers.
+    /// </summary>
+    public const int MinWidth = 4;
+
+    /// <summary>
+    /// Largest allowed width of numbers.
+    /// </summary>
+    public const int MaxWidth = 32;
+
     private readonly Stream stream;
     private readonly int width;
     private readonly byte[] buffer;
@@ -16,12 +26,12 @@ internal class ArbitraryBitWriter : IDisposable
     /// Initializes a new instance of the <see cref="ArbitraryBitWriter"/> class.
     /// </summary>
     /// <param name="stream">Stream to write to.</param>
-    /// <param name="width">Width of integers between 4 and 32 bits.</param>
+    /// <param name="width">Width of integers between <see cref="MinWidth"/> and <see cref="MinWidth"/> bits.</param>
     /// <param name="leaveOpen"><see langword="true"/> to leave the <paramref name="stream"/> open after disposing the <see cref="ArbitraryBitWriter"/> object, <see langword="false"/> otherwise.</param>
     public ArbitraryBitWriter(Stream stream, int width, bool leaveOpen = false)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(width, 4, nameof(width));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, 32, nameof(width));
+        ArgumentOutOfRangeException.ThrowIfLessThan(width, MinWidth, nameof(width));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, MaxWidth, nameof(width));
 
         this.stream = stream;
         this.width = width;

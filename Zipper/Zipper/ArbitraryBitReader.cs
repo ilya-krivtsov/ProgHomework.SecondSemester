@@ -5,6 +5,12 @@ namespace Zipper;
 /// </summary>
 internal class ArbitraryBitReader
 {
+    /// <inheritdoc cref="ArbitraryBitWriter.MinWidth"/>
+    public const int MinWidth = ArbitraryBitWriter.MinWidth;
+
+    /// <inheritdoc cref="ArbitraryBitWriter.MaxWidth"/>
+    public const int MaxWidth = ArbitraryBitWriter.MaxWidth;
+
     private readonly Stream stream;
     private readonly int width;
     private byte buffer;
@@ -14,11 +20,11 @@ internal class ArbitraryBitReader
     /// Initializes a new instance of the <see cref="ArbitraryBitReader"/> class.
     /// </summary>
     /// <param name="stream">Stream to write to.</param>
-    /// <param name="width">Width of integers between 4 and 32 bits.</param>
+    /// <param name="width">Width of integers between <see cref="MinWidth"/> and <see cref="MinWidth"/> bits.</param>
     public ArbitraryBitReader(Stream stream, int width)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(width, 4, nameof(width));
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, 32, nameof(width));
+        ArgumentOutOfRangeException.ThrowIfLessThan(width, MinWidth, nameof(width));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(width, MaxWidth, nameof(width));
 
         this.stream = stream;
         this.width = width;
