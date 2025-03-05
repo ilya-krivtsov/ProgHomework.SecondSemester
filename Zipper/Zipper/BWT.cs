@@ -8,6 +8,8 @@ using System.Diagnostics;
 /// </summary>
 internal static class BWT
 {
+    private static readonly ArrayPool<int> Pool = ArrayPool<int>.Create();
+
     /// <summary>
     /// Transforms given byte sequence using Burrows-Wheeler algorithm.
     /// </summary>
@@ -24,7 +26,7 @@ internal static class BWT
             return -1;
         }
 
-        int[] offsets = ArrayPool<int>.Shared.Rent(length);
+        int[] offsets = Pool.Rent(length);
         for (int i = 0; i < length; i++)
         {
             offsets[i] = i;
@@ -61,7 +63,7 @@ internal static class BWT
             output[i] = inputSpan[(offsets[i] + length - 1) % length];
         }
 
-        ArrayPool<int>.Shared.Return(offsets);
+        Pool.Return(offsets);
 
         Debug.Assert(identityPosition.HasValue, "Identity position not found");
 
@@ -85,7 +87,7 @@ internal static class BWT
 
         int length = input.Length;
 
-        int[] appearances = ArrayPool<int>.Shared.Rent(length);
+        int[] appearances = Pool.Rent(length);
         Span<int> lastAppearances = stackalloc int[256];
         Span<int> byteCounter = stackalloc int[256];
 
@@ -128,6 +130,6 @@ internal static class BWT
             output[^(i + 1)] = lastByte;
         }
 
-        ArrayPool<int>.Shared.Return(appearances);
+        Pool.Return(appearances);
     }
 }
