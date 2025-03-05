@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 /// Trie data structure, also known as prefix tree, implemented as dictionary.
 /// </summary>
 /// <typeparam name="T">Type of values.</typeparam>
-public class Trie<T>
+internal class Trie<T>
     where T : struct
 {
     private readonly Node rootNode = new();
