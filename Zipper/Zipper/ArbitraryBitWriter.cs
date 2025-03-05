@@ -1,5 +1,7 @@
 namespace Zipper;
 
+using System.Buffers;
+
 /// <summary>
 /// Writes unsigned integers of arbitrary width.
 /// </summary>
@@ -14,6 +16,8 @@ internal class ArbitraryBitWriter : IDisposable
     /// Largest allowed width of numbers.
     /// </summary>
     public const int MaxWidth = 32;
+
+    private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Create();
 
     private readonly Stream stream;
     private readonly int width;
@@ -41,7 +45,7 @@ internal class ArbitraryBitWriter : IDisposable
         this.stream = stream;
         this.width = width;
         this.leaveOpen = leaveOpen;
-        buffer = new byte[width];
+        buffer = BufferPool.Rent(width);
         bitsWrittenInBuffer = 0;
     }
 
@@ -73,7 +77,7 @@ internal class ArbitraryBitWriter : IDisposable
             bitsWrittenInBuffer += bitsToBeWritten;
         }
 
-        if (bitsWrittenInBuffer >= buffer.Length * 8)
+        if (bitsWrittenInBuffer >= width * 8)
         {
             Flush();
         }
@@ -120,6 +124,8 @@ internal class ArbitraryBitWriter : IDisposable
         if (disposing)
         {
             Flush();
+            BufferPool.Return(buffer);
+
             if (!leaveOpen)
             {
                 stream.Dispose();
