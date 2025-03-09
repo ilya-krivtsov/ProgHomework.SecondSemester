@@ -14,7 +14,7 @@ internal class ArbitraryBitReader
     private readonly Stream stream;
     private readonly int width;
     private byte buffer;
-    private int? bitsReadFromBuffer;
+    private int bitsReadFromBuffer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArbitraryBitReader"/> class.
@@ -33,7 +33,7 @@ internal class ArbitraryBitReader
 
         this.stream = stream;
         this.width = width;
-        bitsReadFromBuffer = null;
+        bitsReadFromBuffer = int.MaxValue;
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ internal class ArbitraryBitReader
         int remainingWidth = width;
         while (remainingWidth > 0)
         {
-            if (bitsReadFromBuffer is null or >= 8)
+            if (bitsReadFromBuffer >= 8)
             {
                 int readByte = stream.ReadByte();
                 if (readByte == -1)
@@ -60,8 +60,8 @@ internal class ArbitraryBitReader
                 bitsReadFromBuffer = 0;
             }
 
-            int remainingBitsToRead = 8 - bitsReadFromBuffer.Value;
-            int mask = 0xFF >> bitsReadFromBuffer.Value;
+            int remainingBitsToRead = 8 - bitsReadFromBuffer;
+            int mask = 0xFF >> bitsReadFromBuffer;
             int toWrite = (buffer & mask) >> Math.Max(0, remainingBitsToRead - remainingWidth);
 
             int previousRemainingWidth = remainingWidth;
