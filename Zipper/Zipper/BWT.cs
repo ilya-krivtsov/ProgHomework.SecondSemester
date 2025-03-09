@@ -9,6 +9,7 @@ using System.Diagnostics;
 internal static class BWT
 {
     private static readonly ArrayPool<int> Pool = ArrayPool<int>.Create();
+    private static readonly ArrayPool<byte> InputPool = ArrayPool<byte>.Create();
 
     /// <summary>
     /// Transforms given byte sequence using Burrows-Wheeler algorithm.
@@ -16,7 +17,7 @@ internal static class BWT
     /// <param name="input">Input byte sequence.</param>
     /// <param name="output">Span to write transofrmed input to.</param>
     /// <returns>Index that is used to reconstruct byte sequence.</returns>
-    public static int ForwardTransform(Memory<byte> input, Span<byte> output)
+    public static int ForwardTransform(Span<byte> input, Span<byte> output)
     {
         Debug.Assert(input.Length == output.Length, "Length of input and output should be the same");
         int length = input.Length;
@@ -32,12 +33,14 @@ internal static class BWT
             offsets[i] = i;
         }
 
+        var inputCopy = InputPool.Rent(length);
+        input.CopyTo(inputCopy);
+
         int Compare(int x, int y)
         {
-            var inputSpan = input.Span;
             for (int i = 0; i < length; i++)
             {
-                int compare = inputSpan[(i + x) % length] - inputSpan[(i + y) % length];
+                int compare = inputCopy[(i + x) % length] - inputCopy[(i + y) % length];
                 if (compare != 0)
                 {
                     return compare;
@@ -51,7 +54,6 @@ internal static class BWT
 
         offsetsSpan.Sort(Compare);
 
-        var inputSpan = input.Span;
         int? identityPosition = null;
         for (int i = 0; i < length; i++)
         {
@@ -60,10 +62,11 @@ internal static class BWT
                 identityPosition = i;
             }
 
-            output[i] = inputSpan[(offsets[i] + length - 1) % length];
+            output[i] = inputCopy[(offsets[i] + length - 1) % length];
         }
 
         Pool.Return(offsets);
+        InputPool.Return(inputCopy);
 
         Debug.Assert(identityPosition.HasValue, "Identity position not found");
 
