@@ -2,25 +2,6 @@ namespace Zipper.Tests;
 
 public class TrieTests
 {
-    private static readonly byte[][] TestStrings =
-    [
-        .. new string[]
-        {
-            string.Empty,
-            "A",
-            "AB",
-            "ABC",
-            "ABCD",
-        }
-        .Select(System.Text.Encoding.UTF8.GetBytes)
-    ];
-
-    private static readonly byte[][][] TestStringsSet =
-    [
-        TestStrings,
-        [.. TestUtil.GetRandomStrings()]
-    ];
-
     private readonly byte testKey = 157;
     private readonly int testValue = 252354;
 
