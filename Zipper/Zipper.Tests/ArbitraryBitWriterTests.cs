@@ -38,7 +38,7 @@ public class ArbitraryBitWriterTests
         // buffer is filled on every eight Write()
         for (int i = 0; i < 8; i++)
         {
-            writer.Write((uint)(i * i));
+            writer.Write(i * i);
         }
 
         var position = memory.Position;
@@ -53,7 +53,7 @@ public class ArbitraryBitWriterTests
         // buffer is filled on every eight Write()
         for (int i = 0; i < 8; i++)
         {
-            writer.Write((uint)(i * i));
+            writer.Write(i * i);
         }
 
         var position = memory.Position;
@@ -68,7 +68,7 @@ public class ArbitraryBitWriterTests
         // buffer is filled on every eight Write(), so write only 4 numbers
         for (int i = 0; i < 4; i++)
         {
-            writer.Write((uint)(i * i));
+            writer.Write(i * i);
         }
 
         var position = memory.Position;

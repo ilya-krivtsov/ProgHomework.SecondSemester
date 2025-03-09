@@ -1,7 +1,7 @@
 namespace Zipper;
 
 /// <summary>
-/// Reads unsigned integers of arbitrary width.
+/// Reads integers of arbitrary width.
 /// </summary>
 internal class ArbitraryBitReader
 {
@@ -41,7 +41,7 @@ internal class ArbitraryBitReader
     /// </summary>
     /// <param name="number">When this method returns, contains the value that was read, if read successfully, zero otherwise.</param>
     /// <returns><see langword="true"/> if <paramref name="number"/> was successfuly read, <see langword="false"/> otherwise.</returns>
-    public bool ReadNext(out uint number)
+    public bool ReadNext(out int number)
     {
         number = 0;
 
@@ -61,8 +61,8 @@ internal class ArbitraryBitReader
             }
 
             int remainingBitsToRead = 8 - bitsReadFromBuffer.Value;
-            uint mask = 0xFFu >> bitsReadFromBuffer.Value;
-            uint toWrite = (buffer & mask) >> Math.Max(0, remainingBitsToRead - remainingWidth);
+            int mask = 0xFF >> bitsReadFromBuffer.Value;
+            int toWrite = (buffer & mask) >> Math.Max(0, remainingBitsToRead - remainingWidth);
 
             int previousRemainingWidth = remainingWidth;
             remainingWidth -= remainingBitsToRead;

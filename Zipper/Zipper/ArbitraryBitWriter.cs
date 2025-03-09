@@ -3,7 +3,7 @@ namespace Zipper;
 using System.Buffers;
 
 /// <summary>
-/// Writes unsigned integers of arbitrary width.
+/// Writes integers of arbitrary width.
 /// </summary>
 internal class ArbitraryBitWriter : IDisposable
 {
@@ -53,11 +53,11 @@ internal class ArbitraryBitWriter : IDisposable
     /// Writes <paramref name="number"/> to the underlying stream.
     /// </summary>
     /// <param name="number">Number to write.</param>
-    public void Write(uint number)
+    public void Write(int number)
     {
         ObjectDisposedException.ThrowIf(disposed, this);
 
-        number &= 0xFFFFFFFF >> (32 - width);
+        number &= (int)(0xFFFFFFFF >> (32 - width));
 
         int remainingWidth = width;
         while (remainingWidth > 0)
@@ -66,7 +66,7 @@ internal class ArbitraryBitWriter : IDisposable
             int bitsWrittenToCurrentByte = bitsWrittenInBuffer % 8;
             int bitsRemainingInCurrentByte = 8 - bitsWrittenToCurrentByte;
 
-            uint toWrite = number >> Math.Max(0, remainingWidth - bitsRemainingInCurrentByte);
+            int toWrite = number >> Math.Max(0, remainingWidth - bitsRemainingInCurrentByte);
             int previousRemainingWidth = remainingWidth;
             remainingWidth -= bitsRemainingInCurrentByte;
             remainingWidth = Math.Max(0, remainingWidth);
