@@ -21,6 +21,9 @@ public class TrieTests
         [.. TestUtil.GetRandomStrings()]
     ];
 
+    private readonly byte testKey = 157;
+    private readonly int testValue = 252354;
+
     private Trie<int> trie;
 
     [SetUp]
@@ -30,34 +33,99 @@ public class TrieTests
     }
 
     [Test]
-    public void TrieAdd_And_TrieTryGetValue_ReturnsCorrectly_SingleValue([ValueSource(nameof(TestStrings))] byte[] bytes)
-    {
-        TestAddValue(trie, bytes);
-    }
-
-    [Test]
-    public void TrieAdd_And_TrieTryGetValue_ReturnsCorrectly_MultipleValues([ValueSource(nameof(TestStringsSet))] byte[][] strings)
-    {
-        foreach (var bytes in strings)
-        {
-            TestAddValue(trie, bytes);
-        }
-    }
-
-    private static void TestAddValue(Trie<int> trie, byte[] bytes)
+    public void AddChild_ShouldReturnTrue_IfChildDidNotExists()
     {
         Assert.Multiple(() =>
         {
-            Assert.That(trie.TryGetValue(bytes, out _), Is.False);
-
-            Assert.That(Add(trie, bytes), Is.True);
-            Assert.That(Add(trie, bytes), Is.False);
-
-            Assert.That(trie.TryGetValue(bytes, out int value), Is.True);
-            Assert.That(value, Is.EqualTo(bytes.Length));
+            Assert.That(trie.HasChild(testKey), Is.False);
+            Assert.That(trie.AddChild(testKey, testValue), Is.True);
         });
     }
 
-    private static bool Add(Trie<int> trie, byte[] bytes)
-        => trie.Add(bytes, bytes.Length);
+    [Test]
+    public void HasChild_ShouldReturnTrue_IfAddedChild()
+    {
+        trie.AddChild(testKey, testValue);
+        Assert.That(trie.HasChild(testKey), Is.True);
+    }
+
+    [Test]
+    public void HasChild_ShouldReturnFalse_IfChildDoesNotExist()
+    {
+        Assert.That(trie.HasChild(testKey), Is.False);
+    }
+
+    [Test]
+    public void AddChild_ShouldReturnFalse_IfChildExisted()
+    {
+        trie.AddChild(testKey, testValue);
+        Assert.That(trie.AddChild(testKey, testValue), Is.False);
+    }
+
+    [Test]
+    public void Add_ShouldNotMove()
+    {
+        Assert.Multiple(() =>
+        {
+            Assert.That(trie.AtRoot, Is.True);
+            Assert.That(trie.AddChild(testKey, testValue), Is.True);
+            Assert.That(trie.AtRoot, Is.True);
+        });
+    }
+
+    [Test]
+    public void MoveForward_ShouldReturnTrue_IfMovingToAddedChild()
+    {
+        trie.AddChild(testKey, testValue);
+        Assert.That(trie.MoveForward(testKey), Is.True);
+    }
+
+    [Test]
+    public void MoveForward_ShouldReturnFalse_IfChildDoesNotExist()
+    {
+        Assert.That(trie.MoveForward(testKey), Is.False);
+    }
+
+    [Test]
+    public void MoveForward_ShouldMove()
+    {
+        trie.AddChild(testKey, testValue);
+        Assert.Multiple(() =>
+        {
+            Assert.That(trie.AtRoot, Is.True);
+            Assert.That(trie.MoveForward(testKey), Is.True);
+            Assert.That(trie.AtRoot, Is.False);
+        });
+    }
+
+    [Test]
+    public void Reset_ShouldReset_IfMoved()
+    {
+        Assert.That(trie.AtRoot, Is.True);
+
+        trie.AddChild(testKey, testValue);
+        trie.MoveForward(testKey);
+        Assert.That(trie.AtRoot, Is.False);
+
+        trie.Reset();
+        Assert.That(trie.AtRoot, Is.True);
+    }
+
+    [Test]
+    public void AddChild_ShouldAdd_Once()
+    {
+        int valueA = 3463235;
+        int valueB = 73334536;
+
+        trie.AddChild(testKey, valueA);
+        Assert.That(trie.AddChild(testKey, valueB), Is.False);
+    }
+
+    [Test]
+    public void CurrentValue_ShouldReturnAddedValue()
+    {
+        trie.AddChild(testKey, testValue);
+        trie.MoveForward(testKey);
+        Assert.That(trie.CurrentValue, Is.EqualTo(testValue));
+    }
 }

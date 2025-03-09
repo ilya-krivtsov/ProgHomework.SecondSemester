@@ -1,97 +1,88 @@
 namespace Zipper;
 
-using System.Diagnostics.CodeAnalysis;
-
 /// <summary>
-/// Trie data structure, also known as prefix tree, implemented as dictionary.
+/// Trie data structure, also known as prefix tree, that can be traversed through.
 /// </summary>
 /// <typeparam name="T">Type of values.</typeparam>
 internal class Trie<T>
     where T : struct
 {
-    private readonly Node rootNode = new();
+    private readonly Node rootNode = new(default);
+    private Node lastNode;
 
     /// <summary>
-    /// Adds <paramref name="key"/> associated with <paramref name="value"/> to this trie.
+    /// Initializes a new instance of the <see cref="Trie{T}"/> class.
     /// </summary>
-    /// <param name="key">The byte sequence to as key.</param>
-    /// <param name="value">The number to add as value.</param>
-    /// <returns><see langword="true"/> if <paramref name="key"/> wasn't present in trie before adding it, <see langword="false"/> otherwise.</returns>
-    public bool Add(ReadOnlySpan<byte> key, T value)
+    public Trie()
     {
-        var lastNode = rootNode;
-        foreach (var character in key)
-        {
-            lastNode = lastNode.GetOrCreateChild(character);
-        }
+        lastNode = rootNode;
+    }
 
-        if (lastNode.EndOfWord)
+    /// <summary>
+    /// Gets value stored at current position in trie.
+    /// </summary>
+    public T CurrentValue => lastNode.Value;
+
+    /// <summary>
+    /// Gets a value indicating whether current position is root.
+    /// </summary>
+    public bool AtRoot => lastNode == rootNode;
+
+    /// <summary>
+    /// Resets position to root.
+    /// </summary>
+    public void Reset()
+    {
+        lastNode = rootNode;
+    }
+
+    /// <summary>
+    /// Adds child at current position with specified <paramref name="key"/> and <paramref name="value"/>.
+    /// </summary>
+    /// <param name="key">Key of child to add.</param>
+    /// <param name="value">Value of child to add.</param>
+    /// <returns><see langword="true"/> if child with specified key did not exist at current position, <see langword="false"/> otherwise.</returns>
+    public bool AddChild(byte key, T value)
+    {
+        if (HasChild(key))
         {
             return false;
         }
 
-        lastNode.EndOfWord = true;
-        lastNode.Value = value;
+        var node = new Node(value);
+        lastNode.Children[key] = node;
 
         return true;
     }
 
     /// <summary>
-    /// Tries to get value associated with <paramref name="key"/>.
+    /// Moves forward if <paramref name="key"/> is found, otherwise doesn't move.
     /// </summary>
-    /// <param name="key">The key of the value to get.</param>
-    /// <param name="value">
-    /// When this method returns, contains the value associated with <paramref name="key"/>, if <paramref name="key"/> is found, <see langword="default"/> otherwise.
-    /// </param>
-    /// <returns><see langword="true"/> if <paramref name="key"/> is found, <see langword="false"/> otherwise.</returns>
-    public bool TryGetValue(ReadOnlySpan<byte> key, out T value)
+    /// <param name="key">Key to search for.</param>
+    /// <returns><see langword="true"/> if moved forward, <see langword="false"/> otherwise.</returns>
+    public bool MoveForward(byte key)
     {
-        value = default;
-        if (GetNode(key, out var node) && node.EndOfWord)
+        if (lastNode.Children.TryGetValue(key, out var existingNode))
         {
-            value = node.Value;
+            lastNode = existingNode;
             return true;
         }
 
         return false;
     }
 
-    private bool GetNode(ReadOnlySpan<byte> prefix, [MaybeNullWhen(false)] out Node node)
+    /// <summary>
+    /// Checks if child with specified <paramref name="key"/> exists at current position.
+    /// </summary>
+    /// <param name="key">Key to search for.</param>
+    /// <returns><see langword="true"/> if child with specified key did not exist at current position, <see langword="false"/> otherwise.</returns>
+    public bool HasChild(byte key)
+        => lastNode.Children.ContainsKey(key);
+
+    private class Node(T value)
     {
-        node = rootNode;
-        foreach (var character in prefix)
-        {
-            if (!node.TryGetChild(character, out node))
-            {
-                return false;
-            }
-        }
+        public Dictionary<byte, Node> Children { get; } = [];
 
-        return true;
-    }
-
-    private class Node
-    {
-        private readonly Dictionary<byte, Node> children = [];
-
-        public bool EndOfWord { get; set; }
-
-        public T Value { get; set; }
-
-        public Node GetOrCreateChild(byte value)
-        {
-            if (!children.TryGetValue(value, out Node? node))
-            {
-                node = new();
-                children[value] = node;
-
-                return node;
-            }
-
-            return node;
-        }
-
-        public bool TryGetChild(byte value, [MaybeNullWhen(false)] out Node node)
-            => children.TryGetValue(value, out node);
+        public T Value { get; } = value;
     }
 }
