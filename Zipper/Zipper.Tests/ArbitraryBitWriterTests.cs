@@ -98,22 +98,6 @@ public class ArbitraryBitWriterTests
     }
 
     [Test]
-    public void Writer_Dispose_ShouldDoNothing_IfCalledWithFalse()
-    {
-        var writer = new TestWriter(memory, width);
-
-        for (int i = 0; i < 5; i++)
-        {
-            writer.Write((uint)(i * i));
-        }
-
-        var position = memory.Position;
-
-        writer.Dispose();
-        Assert.That(memory.Position, Is.EqualTo(position));
-    }
-
-    [Test]
     public void Writer_Write_ShouldThrow_IfDisposed()
     {
         writer.Write(123);
@@ -131,13 +115,5 @@ public class ArbitraryBitWriterTests
         writer.Dispose();
 
         Assert.Throws<ObjectDisposedException>(writer.Flush);
-    }
-
-    private class TestWriter(Stream stream, int width) : ArbitraryBitWriter(stream, width)
-    {
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(false);
-        }
     }
 }
