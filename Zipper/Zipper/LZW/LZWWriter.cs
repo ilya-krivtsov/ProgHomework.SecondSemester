@@ -24,9 +24,6 @@ internal class LZWWriter : IDisposable
     private int bitsWrittenInBlock;
     private bool disableCodeTableExpansion;
 
-    private int blockIndex = 0;
-    private int bytesRead = 0;
-
     private int codeWidth;
     private int codesCount;
 
@@ -68,7 +65,6 @@ internal class LZWWriter : IDisposable
     {
         for (int i = 0; i < buffer.Length; i++)
         {
-            bytesRead++;
             byte value = buffer[i];
             if (trie.AtRoot)
             {
@@ -160,8 +156,6 @@ internal class LZWWriter : IDisposable
             var binWriter = new BinaryWriter(memory);
             binWriter.Write(MaxCodesCount);
             binWriter.Flush();
-
-            Console.WriteLine($"disable code table expansion @ block #{blockIndex}");
         }
 
         writer.Flush();
@@ -176,13 +170,6 @@ internal class LZWWriter : IDisposable
 
             stream.Write(block, 0, length);
             stream.Flush();
-
-            if (blockIndex < 20 || (blockIndex % 1024) == 0 || type == BlockType.FixCodeTableSize)
-            {
-                Console.WriteLine($"wrote block #{blockIndex}, read: {bytesRead / 1024.0:0.00} K, block size: {dataLength}, codeWidth: {codeWidth}, used codes: {codesCount}");
-            }
-
-            blockIndex++;
         }
 
         Array.Clear(block);
