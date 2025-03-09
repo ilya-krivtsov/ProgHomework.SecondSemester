@@ -17,7 +17,7 @@ internal static class BWT
     /// <param name="input">Input byte sequence.</param>
     /// <param name="output">Span to write transofrmed input to.</param>
     /// <returns>Index that is used to reconstruct byte sequence.</returns>
-    public static int ForwardTransform(Span<byte> input, Span<byte> output)
+    public static int ForwardTransform(ReadOnlySpan<byte> input, Span<byte> output)
     {
         Debug.Assert(input.Length == output.Length, "Length of input and output should be the same");
         int length = input.Length;
@@ -79,7 +79,7 @@ internal static class BWT
     /// <param name="input">Transformed byte sequence.</param>
     /// <param name="identityIndex">Index that is used to reconstruct byte sequence.</param>
     /// <param name="output">Span to write reconstructed byte sequence to.</param>
-    public static void InverseTransform(Span<byte> input, int identityIndex, Span<byte> output)
+    public static void InverseTransform(ReadOnlySpan<byte> input, int identityIndex, Span<byte> output)
     {
         Debug.Assert(input.Length == output.Length, "Length of input and output should be the same");
 
