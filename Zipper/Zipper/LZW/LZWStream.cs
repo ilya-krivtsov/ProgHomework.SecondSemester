@@ -29,7 +29,7 @@ public class LZWStream : Stream
     private bool disposed;
 
     /// <inheritdoc cref="LZWStream(Stream, int, ZipperMode, bool)"/>
-    public LZWStream(Stream stream, ZipperMode mode = ZipperMode.Compress, bool leaveOpen = false)
+    public LZWStream(Stream stream, ZipperMode mode, bool leaveOpen = false)
         : this(stream, DefaultBlockSize, mode, leaveOpen)
     {
     }
@@ -46,7 +46,7 @@ public class LZWStream : Stream
     /// </param>
     /// <exception cref="ArgumentException"><paramref name="mode"/> is not <see cref="ZipperMode.Compress"/> nor <see cref="ZipperMode.Decompress"/>.</exception>
     /// <exception cref="IndexOutOfRangeException"><paramref name="blockSize"/> is out of range.</exception>
-    public LZWStream(Stream stream, int blockSize, ZipperMode mode = ZipperMode.Compress, bool leaveOpen = false)
+    public LZWStream(Stream stream, int blockSize, ZipperMode mode, bool leaveOpen = false)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(blockSize, MinBlockSize);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(blockSize, MaxBlockSize);
