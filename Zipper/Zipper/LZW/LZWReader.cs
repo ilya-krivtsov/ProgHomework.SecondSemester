@@ -31,6 +31,11 @@ internal class LZWReader : IDisposable
     /// <param name="stream">Stream to read from.</param>
     public LZWReader(Stream stream)
     {
+        if (!stream.CanRead)
+        {
+            throw new ArgumentException("Stream does not support reading", nameof(stream));
+        }
+
         this.stream = stream;
 
         storedCodes = [];

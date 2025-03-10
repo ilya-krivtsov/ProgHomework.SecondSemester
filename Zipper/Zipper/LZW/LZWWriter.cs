@@ -37,6 +37,11 @@ internal class LZWWriter : IDisposable
         ArgumentOutOfRangeException.ThrowIfLessThan(blockSize, LZWStream.MinBlockSize);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(blockSize, LZWStream.MaxBlockSize);
 
+        if (!stream.CanWrite)
+        {
+            throw new ArgumentException("Stream does not support writing", nameof(stream));
+        }
+
         this.stream = stream;
         this.blockSize = blockSize;
 
