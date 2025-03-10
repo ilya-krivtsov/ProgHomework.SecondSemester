@@ -44,6 +44,8 @@ public class LZWStream : Stream
     /// The value indicating whether <paramref name="stream"/> should be disposed along with this instance,
     /// if <paramref name="mode"/> is <see cref="ZipperMode.Compress"/>.
     /// </param>
+    /// <exception cref="ArgumentException"><paramref name="mode"/> is not <see cref="ZipperMode.Compress"/> nor <see cref="ZipperMode.Decompress"/>.</exception>
+    /// <exception cref="IndexOutOfRangeException"><paramref name="blockSize"/> is out of range.</exception>
     public LZWStream(Stream stream, int blockSize, ZipperMode mode = ZipperMode.Compress, bool leaveOpen = false)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(blockSize, MinBlockSize);
@@ -120,7 +122,7 @@ public class LZWStream : Stream
     /// <summary>
     /// Flushes the internal buffers.
     /// </summary>
-    /// <inheritdoc/>
+    /// <exception cref="ObjectDisposedException">Stream is disposed.</exception>
     public override void Flush()
     {
         EnsureNotClosed();
@@ -131,15 +133,32 @@ public class LZWStream : Stream
         }
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Reads data from underlying stream, decompresses it and writes to <paramref name="buffer"/>.
+    /// </summary>
+    /// <param name="buffer">Buffer to write decompressed data to.</param>
+    /// <param name="offset">How many bytes to skip before reading from <paramref name="buffer"/>.</param>
+    /// <param name="count">How many bytes to read from <paramref name="buffer"/>.</param>
+    /// <returns>Count of read bytes.</returns>
+    /// <exception cref="EndOfStreamException">Unexpected end of stream.</exception>
+    /// <exception cref="InvalidDataException">Invalid data stream.</exception>
+    /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Compress"/> mode.</exception>
+    /// <exception cref="ObjectDisposedException">Stream is disposed.</exception>
     public override int Read(byte[] buffer, int offset, int count)
         => Read(buffer.AsSpan(offset, count));
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Reads data from underlying stream, decompresses it and writes to <paramref name="buffer"/>.
+    /// </summary>
+    /// <param name="buffer">Buffer to write decompressed data to.</param>
+    /// <param name="offset">How many bytes to skip before reading from <paramref name="buffer"/>.</param>
+    /// <param name="count">How many bytes to read from <paramref name="buffer"/>.</param>
+    /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Decompress"/> mode.</exception>
+    /// <exception cref="ObjectDisposedException">Stream is disposed.</exception>
     public override void Write(byte[] buffer, int offset, int count)
         => Write(buffer.AsSpan(offset, count));
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="Write(byte[], int, int)"/>
     public override void Write(ReadOnlySpan<byte> buffer)
     {
         EnsureNotClosed();
@@ -150,7 +169,7 @@ public class LZWStream : Stream
         writer.Write(buffer);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="Read(byte[], int, int)"/>
     public override int Read(Span<byte> buffer)
     {
         EnsureNotClosed();
