@@ -139,13 +139,10 @@ public class LZWStream : Stream
     /// <param name="buffer">Buffer to write decompressed data to.</param>
     /// <param name="offset">How many bytes to skip before reading from <paramref name="buffer"/>.</param>
     /// <param name="count">How many bytes to read from <paramref name="buffer"/>.</param>
-    /// <returns>Count of read bytes.</returns>
-    /// <exception cref="EndOfStreamException">Unexpected end of stream.</exception>
-    /// <exception cref="InvalidDataException">Invalid data stream.</exception>
-    /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Compress"/> mode.</exception>
+    /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Decompress"/> mode.</exception>
     /// <exception cref="ObjectDisposedException">Stream is disposed.</exception>
-    public override int Read(byte[] buffer, int offset, int count)
-        => Read(buffer.AsSpan(offset, count));
+    public override void Write(byte[] buffer, int offset, int count)
+        => Write(buffer.AsSpan(offset, count));
 
     /// <summary>
     /// Reads data from underlying stream, decompresses it and writes to <paramref name="buffer"/>.
@@ -153,10 +150,13 @@ public class LZWStream : Stream
     /// <param name="buffer">Buffer to write decompressed data to.</param>
     /// <param name="offset">How many bytes to skip before reading from <paramref name="buffer"/>.</param>
     /// <param name="count">How many bytes to read from <paramref name="buffer"/>.</param>
-    /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Decompress"/> mode.</exception>
+    /// <returns>Count of read bytes.</returns>
+    /// <exception cref="EndOfStreamException">Unexpected end of stream.</exception>
+    /// <exception cref="InvalidDataException">Invalid data stream.</exception>
+    /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Compress"/> mode.</exception>
     /// <exception cref="ObjectDisposedException">Stream is disposed.</exception>
-    public override void Write(byte[] buffer, int offset, int count)
-        => Write(buffer.AsSpan(offset, count));
+    public override int Read(byte[] buffer, int offset, int count)
+        => Read(buffer.AsSpan(offset, count));
 
     /// <inheritdoc cref="Write(byte[], int, int)"/>
     public override void Write(ReadOnlySpan<byte> buffer)
