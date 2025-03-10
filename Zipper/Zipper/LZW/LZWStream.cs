@@ -37,9 +37,9 @@ public class LZWStream : Stream
     /// <summary>
     /// Initializes a new instance of the <see cref="LZWStream"/> class.
     /// </summary>
-    /// <param name="stream">The stream to which compressed data is written or from which data to uncompress is read.</param>
+    /// <param name="stream">The stream to which compressed data is written or from which data to decompress is read.</param>
     /// <param name="blockSize">The internal block size to use, should be between <see cref="MinBlockSize"/> and <see cref="MaxBlockSize"/>.</param>
-    /// <param name="mode"><see cref="ZipperMode"/> that determines whether to compress or uncompress data.</param>
+    /// <param name="mode"><see cref="ZipperMode"/> that determines whether to compress or decompress data.</param>
     /// <param name="leaveOpen">
     /// The value indicating whether <paramref name="stream"/> should be disposed along with this instance,
     /// if <paramref name="mode"/> is <see cref="ZipperMode.Compress"/>.
