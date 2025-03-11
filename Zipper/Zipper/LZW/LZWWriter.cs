@@ -131,12 +131,15 @@ internal class LZWWriter : IDisposable
     {
         FlushInternal(BlockType.Default);
 
-        writer.Write(trie.CurrentValue);
-        bitsWrittenInBlock += codeWidth;
+        if (!trie.AtRoot)
+        {
+            writer.Write(trie.CurrentValue);
+            bitsWrittenInBlock += codeWidth;
 
-        trie.Reset();
+            trie.Reset();
 
-        FlushInternal(BlockType.Default);
+            FlushInternal(BlockType.Flush);
+        }
     }
 
     /// <summary>

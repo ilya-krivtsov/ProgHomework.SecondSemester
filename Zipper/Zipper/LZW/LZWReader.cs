@@ -17,6 +17,7 @@ internal class LZWReader : IDisposable
     private byte[]? block;
     private int blockSize;
     private bool endOfStreamReached;
+    private bool flushed;
 
     private byte[]? word;
     private int wordPosition;
@@ -93,6 +94,12 @@ internal class LZWReader : IDisposable
                     break;
                 }
 
+                if (blockSize == 0)
+                {
+                    block = null;
+                    continue;
+                }
+
                 throw new EndOfStreamException();
             }
 
@@ -112,9 +119,12 @@ internal class LZWReader : IDisposable
                     lastWordCode++;
                 }
 
-                var newWord = new byte[word.Length + 1];
-                word.CopyTo(newWord, 0);
-                storedCodes[lastWordCode] = newWord;
+                if (!flushed)
+                {
+                    var newWord = new byte[word.Length + 1];
+                    word.CopyTo(newWord, 0);
+                    storedCodes[lastWordCode] = newWord;
+                }
             }
 
             if (memory.Position >= blockSize)
@@ -161,6 +171,7 @@ internal class LZWReader : IDisposable
         switch (blockType)
         {
             case BlockType.Default:
+                flushed = false;
                 break;
 
             case BlockType.FixCodeTableSize:
@@ -169,6 +180,10 @@ internal class LZWReader : IDisposable
 
             case BlockType.EndOfStream:
                 endOfStreamReached = true;
+                break;
+
+            case BlockType.Flush:
+                flushed = true;
                 break;
 
             default:

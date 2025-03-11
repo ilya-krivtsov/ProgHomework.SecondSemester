@@ -19,4 +19,9 @@ internal enum BlockType : byte
     /// This block was written after <see cref="LZWWriter.Dispose()"/> and is the last one to be read.
     /// </summary>
     EndOfStream = 2,
+
+    /// <summary>
+    /// This block was written after <see cref="LZWWriter.Flush()"/>.
+    /// </summary>
+    Flush = 3,
 }
