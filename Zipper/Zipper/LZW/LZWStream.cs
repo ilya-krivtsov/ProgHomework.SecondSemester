@@ -8,12 +8,12 @@ using System.Diagnostics;
 public class LZWStream : Stream
 {
     /// <summary>
-    /// Smallest allowed Block length.
+    /// Smallest allowed block length.
     /// </summary>
     public const int MinBlockSize = 256;
 
     /// <summary>
-    /// Largest allowed Block length.
+    /// Largest allowed block length.
     /// </summary>
     public const int MaxBlockSize = 64 * 1024;
 
@@ -78,13 +78,13 @@ public class LZWStream : Stream
     public override bool CanRead => mode == ZipperMode.Decompress && stream.CanRead;
 
     /// <summary>
-    /// Gets a value indicating whether the stream supports reading.
+    /// Gets a value indicating whether the stream supports writing.
     /// </summary>
     /// <inheritdoc/>
     public override bool CanWrite => mode == ZipperMode.Compress && stream.CanWrite;
 
     /// <summary>
-    /// Gets a value indicating whether the stream supports reading.
+    /// Gets a value indicating whether the stream supports seeking.
     /// </summary>
     /// <inheritdoc/>
     public override bool CanSeek => false;
@@ -134,9 +134,9 @@ public class LZWStream : Stream
     }
 
     /// <summary>
-    /// Reads data from underlying stream, decompresses it and writes to <paramref name="buffer"/>.
+    /// Reads data from <paramref name="buffer"/>, compresses it and writes it to the underlying stream.
     /// </summary>
-    /// <param name="buffer">Buffer to write decompressed data to.</param>
+    /// <param name="buffer">Buffer that contains data to be compressed.</param>
     /// <param name="offset">How many bytes to skip before reading from <paramref name="buffer"/>.</param>
     /// <param name="count">How many bytes to read from <paramref name="buffer"/>.</param>
     /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Decompress"/> mode.</exception>
@@ -145,12 +145,12 @@ public class LZWStream : Stream
         => Write(buffer.AsSpan(offset, count));
 
     /// <summary>
-    /// Reads data from underlying stream, decompresses it and writes to <paramref name="buffer"/>.
+    /// Reads data from the underlying stream, decompresses it and writes to <paramref name="buffer"/>.
     /// </summary>
     /// <param name="buffer">Buffer to write decompressed data to.</param>
-    /// <param name="offset">How many bytes to skip before reading from <paramref name="buffer"/>.</param>
-    /// <param name="count">How many bytes to read from <paramref name="buffer"/>.</param>
-    /// <returns>Count of read bytes.</returns>
+    /// <param name="offset">How many bytes to skip before writing to <paramref name="buffer"/>.</param>
+    /// <param name="count">How many bytes to write to <paramref name="buffer"/>.</param>
+    /// <returns>Count of read bytes, can be less than <paramref name="count"/>.</returns>
     /// <exception cref="EndOfStreamException">Unexpected end of stream.</exception>
     /// <exception cref="InvalidDataException">Invalid data stream.</exception>
     /// <exception cref="InvalidOperationException">Stream is set to <see cref="ZipperMode.Compress"/> mode.</exception>
