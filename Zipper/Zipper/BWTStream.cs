@@ -12,14 +12,14 @@ internal class BWTStream : Stream
     /// <summary>
     /// Smallest allowed block length.
     /// </summary>
-    public const int MinBlockSize = 64;
+    public const int MinBlockSize = 1024;
 
     /// <summary>
     /// Largest allowed block length.
     /// </summary>
-    public const int MaxBlockSize = 4 * 1024;
+    public const int MaxBlockSize = 16384;
 
-    private const int DefaultBlockSize = 512;
+    private const int DefaultBlockSize = (MinBlockSize + MaxBlockSize) / 2;
 
     private static readonly ArrayPool<byte> BlockPool = ArrayPool<byte>.Create();
 

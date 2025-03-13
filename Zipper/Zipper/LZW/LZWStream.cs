@@ -10,14 +10,14 @@ public class LZWStream : Stream
     /// <summary>
     /// Smallest allowed block length.
     /// </summary>
-    public const int MinBlockSize = 256;
+    public const int MinBlockSize = 4096;
 
     /// <summary>
     /// Largest allowed block length.
     /// </summary>
-    public const int MaxBlockSize = 64 * 1024;
+    public const int MaxBlockSize = 256 * 1024;
 
-    private const int DefaultBlockSize = 1024;
+    private const int DefaultBlockSize = (MinBlockSize + MaxBlockSize) / 2;
 
     private readonly Stream stream;
     private readonly ZipperMode mode;
