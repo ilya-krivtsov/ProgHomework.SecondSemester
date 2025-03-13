@@ -1,17 +1,18 @@
-namespace Zipper.Tests.LZW;
+namespace Zipper.Tests.Streams;
 
-using Zipper.LZW;
-
-public class LZWStreamExceptionsTests
+public abstract class StreamExceptionsTests<TStream, TMode, TProvider>
+    where TStream : Stream
+    where TMode : Enum
+    where TProvider : IStreamProvider<TStream, TMode>
 {
-    private LZWStream compressor;
-    private LZWStream decompressor;
+    private TStream compressor;
+    private TStream decompressor;
 
     [SetUp]
     public void Setup()
     {
-        compressor = new LZWStream(Stream.Null, ZipperMode.Compress);
-        decompressor = new LZWStream(Stream.Null, ZipperMode.Decompress);
+        compressor = TProvider.CreateStream(Stream.Null, TProvider.MinBlockSize, TProvider.WritingMode);
+        decompressor = TProvider.CreateStream(Stream.Null, TProvider.MinBlockSize, TProvider.ReadingMode);
     }
 
     [TearDown]
@@ -24,27 +25,26 @@ public class LZWStreamExceptionsTests
     [Test]
     public void Constructor_ShouldThrowIf_BlockSize_IsIncorrect()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new LZWStream(Stream.Null, LZWStream.MinBlockSize - 1, ZipperMode.Compress));
-        Assert.Throws<ArgumentOutOfRangeException>(() => new LZWStream(Stream.Null, LZWStream.MaxBlockSize + 1, ZipperMode.Compress));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TProvider.CreateStream(Stream.Null, TProvider.MinBlockSize - 1, TProvider.WritingMode));
+        Assert.Throws<ArgumentOutOfRangeException>(() => TProvider.CreateStream(Stream.Null, TProvider.MaxBlockSize + 1, TProvider.WritingMode));
     }
 
     [Test]
     public void Constructor_ShouldThrowIf_Mode_IsNotDefined()
     {
-        Assert.Throws<ArgumentException>(() => new LZWStream(Stream.Null, ZipperMode.Compress + 10));
-        Assert.Throws<ArgumentException>(() => new LZWStream(Stream.Null, ZipperMode.Decompress + 100));
+        Assert.Throws<ArgumentException>(() => TProvider.CreateStream(Stream.Null, TProvider.UndefinedMode));
     }
 
     [Test]
     public void Constructor_ShouldThrowIf_Mode_IsCompress_And_Stream_CanNotWrite()
     {
-        Assert.Throws<ArgumentException>(() => new LZWStream(new UnwriteableStream(), ZipperMode.Compress));
+        Assert.Throws<ArgumentException>(() => TProvider.CreateStream(new UnwriteableStream(), TProvider.WritingMode));
     }
 
     [Test]
     public void Constructor_ShouldThrowIf_Mode_IsDecompress_And_Stream_CanNotRead()
     {
-        Assert.Throws<ArgumentException>(() => new LZWStream(new UnreadableStream(), ZipperMode.Decompress));
+        Assert.Throws<ArgumentException>(() => TProvider.CreateStream(new UnreadableStream(), TProvider.ReadingMode));
     }
 
     [Test]

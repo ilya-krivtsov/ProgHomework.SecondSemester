@@ -1,7 +1,7 @@
-namespace Zipper.Tests.LZW;
+namespace Zipper.Tests.Streams;
 
 [SetUpFixture]
-public class LZWTestsSource
+public class StreamTestsSource
 {
     // "https://en.wikipedia.org/wiki/Lempel–Ziv–Welch";
     private const string DataUrl = "https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Welch";

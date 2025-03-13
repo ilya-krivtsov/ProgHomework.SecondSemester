@@ -1,9 +1,9 @@
-namespace Zipper.Tests.LZW;
+namespace Zipper.Tests.Streams;
 
-using System.Text;
-using Zipper.LZW;
-
-public class LZWStreamReadWriteTests
+public abstract class StreamReadWriteTests<TStream, TMode, TProvider>
+    where TStream : Stream
+    where TMode : Enum
+    where TProvider : IStreamProvider<TStream, TMode>
 {
     private static readonly int[] BufferSizes = [1, 2, 3, 7, 14, 19, 31, 63, 127, 255, 1023];
 
@@ -18,9 +18,9 @@ public class LZWStreamReadWriteTests
     [Test]
     public void Read_ShouldReadData_WrittenBy_Write_Correctly([ValueSource(nameof(BufferSizes))] int readBufferSize)
     {
-        var testData = LZWTestsSource.Data;
+        var testData = GetData(readBufferSize);
 
-        using (var compressor = new LZWStream(stream, ZipperMode.Compress, true))
+        using (var compressor = TProvider.CreateStream(stream, TProvider.WritingMode, true))
         {
             compressor.Write(testData);
         }
@@ -31,9 +31,9 @@ public class LZWStreamReadWriteTests
     [Test]
     public void Flush_ShouldNotAffect_DataToBeRead([ValueSource(nameof(BufferSizes))] int readWriteBufferSize)
     {
-        var testData = LZWTestsSource.Data.AsSpan();
+        var testData = GetData(readWriteBufferSize);
 
-        using (var compressor = new LZWStream(stream, ZipperMode.Compress, true))
+        using (var compressor = TProvider.CreateStream(stream, TProvider.WritingMode, true))
         {
             for (int offset = 0; offset < testData.Length; offset += readWriteBufferSize)
             {
@@ -46,11 +46,19 @@ public class LZWStreamReadWriteTests
         DecompressData_And_AssertThat_ItIsCorrect(testData, readWriteBufferSize);
     }
 
+    private static ReadOnlySpan<byte> GetData(int bufferSize)
+    {
+        var data = StreamTestsSource.Data.AsSpan();
+        var relativeLength = Math.Clamp(bufferSize / (float)BufferSizes[^1], 0, 1);
+
+        return data[..(int)Math.Ceiling(data.Length * relativeLength)];
+    }
+
     private void DecompressData_And_AssertThat_ItIsCorrect(ReadOnlySpan<byte> testData, int readBufferSize)
     {
         stream.Seek(0, SeekOrigin.Begin);
 
-        using var decompressor = new LZWStream(stream, ZipperMode.Decompress, true);
+        using var decompressor = TProvider.CreateStream(stream, TProvider.ReadingMode, true);
         int offset = 0;
         Span<byte> buffer = stackalloc byte[readBufferSize];
 
