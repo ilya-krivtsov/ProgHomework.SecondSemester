@@ -18,7 +18,7 @@ public abstract class StreamReadWriteTests<TStream, TMode, TProvider>
     [Test]
     public void Read_ShouldReadData_WrittenBy_Write_Correctly([ValueSource(nameof(BufferSizes))] int readBufferSize)
     {
-        var testData = GetData(readBufferSize);
+        var testData = GetData(StreamTestsSource.ImageData, readBufferSize);
 
         using (var compressor = TProvider.CreateStream(stream, TProvider.WritingMode, true))
         {
@@ -31,7 +31,7 @@ public abstract class StreamReadWriteTests<TStream, TMode, TProvider>
     [Test]
     public void Flush_ShouldNotAffect_DataToBeRead([ValueSource(nameof(BufferSizes))] int readWriteBufferSize)
     {
-        var testData = GetData(readWriteBufferSize);
+        var testData = GetData(StreamTestsSource.TextData, readWriteBufferSize);
 
         using (var compressor = TProvider.CreateStream(stream, TProvider.WritingMode, true))
         {
@@ -46,9 +46,8 @@ public abstract class StreamReadWriteTests<TStream, TMode, TProvider>
         DecompressData_And_AssertThat_ItIsCorrect(testData, readWriteBufferSize);
     }
 
-    private static ReadOnlySpan<byte> GetData(int bufferSize)
+    private static ReadOnlySpan<byte> GetData(ReadOnlySpan<byte> data, int bufferSize)
     {
-        var data = StreamTestsSource.Data.AsSpan();
         var relativeLength = Math.Clamp(bufferSize / (float)BufferSizes[^1], 0, 1);
 
         return data[..(int)Math.Ceiling(data.Length * relativeLength)];
