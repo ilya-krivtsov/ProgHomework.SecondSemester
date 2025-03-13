@@ -1,6 +1,6 @@
 namespace Zipper.Tests.Streams;
 
-public class BWTStreamTests
+internal class BWTStreamTests
 {
     public class BWTStreamProvider : IStreamProvider<BWTStream, BWTMode>
     {

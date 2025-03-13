@@ -3,7 +3,7 @@ namespace Zipper;
 /// <summary>
 /// Specifies whether to transform data to or reconstruct data from the underlying stream in <see cref="BWTStream"/>.
 /// </summary>
-public enum BWTMode
+internal enum BWTMode
 {
     /// <summary>
     /// Transform data and write it to the underlying stream.

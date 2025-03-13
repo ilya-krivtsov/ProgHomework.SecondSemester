@@ -7,7 +7,7 @@ using System.Diagnostics;
 /// <summary>
 /// Provides methods and properties used to transform and reconstruct data streams by using the BWT algorithm.
 /// </summary>
-public class BWTStream : Stream
+internal class BWTStream : Stream
 {
     /// <summary>
     /// Smallest allowed block length.
