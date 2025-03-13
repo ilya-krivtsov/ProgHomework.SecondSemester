@@ -150,7 +150,7 @@ internal class LZWReader : IDisposable
 
     private bool TryReadBuffer()
     {
-        int headerSize = 4;
+        int headerSize = 6;
         Span<byte> header = stackalloc byte[headerSize];
         if (stream.Read(header) != headerSize)
         {
@@ -160,7 +160,7 @@ internal class LZWReader : IDisposable
         var blockType = (BlockType)header[0];
         var codeWidth = header[1];
 
-        blockSize = BinaryPrimitives.ReadUInt16LittleEndian(header[2..4]);
+        blockSize = BinaryPrimitives.ReadInt32LittleEndian(header[2..6]);
         block = BlockPool.Rent(blockSize);
 
         if (stream.Read(block, 0, blockSize) != blockSize)

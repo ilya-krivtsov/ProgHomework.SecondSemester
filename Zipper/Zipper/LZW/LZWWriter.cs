@@ -9,7 +9,7 @@ using System.Diagnostics;
 /// </summary>
 internal class LZWWriter : IDisposable
 {
-    private const int DataOffset = 4;
+    private const int DataOffset = 6;
     private const int MaxCodesCount = (320 * 1024) - 1;
 
     private static readonly ArrayPool<byte> BlockPool = ArrayPool<byte>.Create();
@@ -168,13 +168,13 @@ internal class LZWWriter : IDisposable
 
         writer.Flush();
         int length = (int)memory.Position;
-        ushort dataLength = (ushort)(length - DataOffset);
+        int dataLength = length - DataOffset;
 
         if (!(dataLength == 0 && type == BlockType.Default))
         {
             block[0] = (byte)type;
             block[1] = (byte)codeWidth;
-            BinaryPrimitives.WriteUInt16LittleEndian(block.AsSpan()[2..4], dataLength);
+            BinaryPrimitives.WriteInt32LittleEndian(block.AsSpan()[2..6], dataLength);
 
             stream.Write(block, 0, length);
             stream.Flush();
