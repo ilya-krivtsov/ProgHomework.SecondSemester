@@ -245,10 +245,7 @@ public class BWTStream : Stream
         {
             Flush();
 
-            if (block != null)
-            {
-                BlockPool.Return(block);
-            }
+            Debug.Assert(block == null, "Block was not returned");
 
             if (!leaveOpen)
             {
@@ -292,12 +289,17 @@ public class BWTStream : Stream
         blockSize = BinaryPrimitives.ReadInt32LittleEndian(header[0..4]);
         var identityIndex = BinaryPrimitives.ReadInt32LittleEndian(header[4..8]);
 
+        if (identityIndex < 0 || identityIndex >= blockSize)
+        {
+            throw new InvalidDataException();
+        }
+
         var transformedData = BlockPool.Rent(blockSize);
         if (stream.Read(transformedData, 0, blockSize) != blockSize)
         {
             BlockPool.Return(transformedData);
 
-            return false;
+            throw new EndOfStreamException();
         }
 
         block = BlockPool.Rent(blockSize);
