@@ -19,7 +19,8 @@ internal static class BWT
     /// <returns>Index that is used to reconstruct byte sequence.</returns>
     public static int ForwardTransform(ReadOnlySpan<byte> input, Span<byte> output)
     {
-        Debug.Assert(input.Length == output.Length, "Length of input and output should be the same");
+        ArgumentOutOfRangeException.ThrowIfLessThan(output.Length, input.Length, nameof(output));
+
         int length = input.Length;
 
         if (length == 0)
@@ -81,7 +82,7 @@ internal static class BWT
     /// <param name="output">Span to write reconstructed byte sequence to.</param>
     public static void InverseTransform(ReadOnlySpan<byte> input, int identityIndex, Span<byte> output)
     {
-        Debug.Assert(input.Length == output.Length, "Length of input and output should be the same");
+        ArgumentOutOfRangeException.ThrowIfLessThan(output.Length, input.Length, nameof(output));
 
         if (identityIndex == -1)
         {
@@ -124,13 +125,13 @@ internal static class BWT
 
         int lastIdentityIndex = identityIndex;
         byte lastByte = input[lastIdentityIndex];
-        output[^1] = input[identityIndex];
+        output[length - 1] = input[identityIndex];
 
         for (int i = 1; i < length; i++)
         {
             lastIdentityIndex = appearances[lastIdentityIndex] + lesserBytesCounter[lastByte];
             lastByte = input[lastIdentityIndex];
-            output[^(i + 1)] = lastByte;
+            output[length - (i + 1)] = lastByte;
         }
 
         Pool.Return(appearances);
