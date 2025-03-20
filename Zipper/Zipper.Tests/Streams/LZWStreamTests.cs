@@ -2,7 +2,7 @@ namespace Zipper.Tests.Streams;
 
 using Zipper.LZW;
 
-public class LZWStreamTests
+internal class LZWStreamTests
 {
     public class LZWStreamProvider : IStreamProvider<LZWStream, ZipperMode>
     {

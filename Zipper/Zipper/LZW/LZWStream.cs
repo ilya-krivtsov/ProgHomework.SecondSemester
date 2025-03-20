@@ -5,7 +5,7 @@ using System.Diagnostics;
 /// <summary>
 /// Provides methods and properties used to compress and decompress streams by using the LZW algorithm.
 /// </summary>
-public class LZWStream : Stream
+internal class LZWStream : Stream
 {
     /// <summary>
     /// Smallest allowed block length.
