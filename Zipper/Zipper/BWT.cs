@@ -25,7 +25,7 @@ internal static class BWT
 
         if (length == 0)
         {
-            return -1;
+            return 0;
         }
 
         int[] offsets = Pool.Rent(length);
@@ -82,10 +82,14 @@ internal static class BWT
     /// <param name="output">Span to write reconstructed byte sequence to.</param>
     public static void InverseTransform(ReadOnlySpan<byte> input, int identityIndex, Span<byte> output)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(identityIndex, nameof(identityIndex));
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(identityIndex, input.Length, nameof(identityIndex));
+
         ArgumentOutOfRangeException.ThrowIfLessThan(output.Length, input.Length, nameof(output));
 
-        if (identityIndex == -1)
+        if (input.Length <= 1)
         {
+            input.CopyTo(output);
             return;
         }
 
