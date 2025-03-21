@@ -8,7 +8,11 @@ jobs:
     name: build-and-test-${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            build-script: ./build.sh
+          - os: windows-latest
+            build-script: ./build.ps1
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -19,15 +23,7 @@ jobs:
         dotnet-version: 9.0.x
 
     - name: Build
-      if: runner.os == 'Windows'
-      run: ./build.ps1 build
-    - name: Build
-      if: runner.os == 'Linux'
-      run: ./build.sh build
+      run: ${{ matrix.build-script }} build
 
     - name: Test
-      if: runner.os == 'Windows'
-      run: ./build.ps1 test
-    - name: Test
-      if: runner.os == 'Linux'
-      run: ./build.sh test
+      run: ${{ matrix.build-script }} test
