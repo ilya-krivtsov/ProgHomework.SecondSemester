@@ -1,5 +1,7 @@
 namespace Routers;
 
+using System.Diagnostics.CodeAnalysis;
+
 /// <summary>
 /// Utility class for optimizing network graphs.
 /// </summary>
@@ -9,8 +11,9 @@ public static class GraphOptimizer
     /// Optimizes network graph.
     /// </summary>
     /// <param name="graph">Graph to optimize.</param>
-    /// <returns>Optimized graph.</returns>
-    public static Graph Optimize(Graph graph)
+    /// <param name="optimized">When this method returns, contains optimized graph, if read successfully, <see langword="null"/> otherwise.</param>
+    /// <returns><see langword="true"/> if <paramref name="graph"/> is connected, <see langword="false"/> otherwise.</returns>
+    public static bool Optimize(Graph graph, [MaybeNullWhen(false)] out Graph optimized)
     {
         // use negative weights as workaround, so +1 is greater than any broadband
         var broadbands = graph.Nodes.ToDictionary(x => x, x => 1);
@@ -53,10 +56,12 @@ public static class GraphOptimizer
 
         if (visited.Count != graph.Nodes.Count)
         {
-            throw new ArgumentException("The graph is disconnected", nameof(graph));
+            optimized = null;
+            return false;
         }
 
-        return new(newNodes);
+        optimized = new(newNodes);
+        return true;
     }
 
     private readonly record struct Edge(Graph.Node From, Graph.Node To);
