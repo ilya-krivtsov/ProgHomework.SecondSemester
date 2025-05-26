@@ -22,7 +22,7 @@
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <Label x:Name="resultText" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" FontSize="80" Conten="0"
+        <Label x:Name="resultText" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" FontSize="80" Content="0"
             HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
 
         <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="0" FontSize="48" Margin="4" Click="OnZero"
