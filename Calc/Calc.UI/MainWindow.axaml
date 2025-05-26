@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="512" d:DesignHeight="640"
+        x:Class="Calc.UI.MainWindow"
+        Width="512" Height="640" CanResize="false">
+
+    <Grid x:Name="buttonsGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="120"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Label x:Name="resultText" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" FontSize="80" Conten="0"
+            HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+
+        <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="0" FontSize="48" Margin="4" Click="OnZero"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Button Grid.Row="5" Grid.Column="2" Content="." FontSize="48" Margin="4" Click="OnDecimal"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+        <Button Grid.Row="1" Grid.Column="0" Content="C" FontSize="48" Margin="4" Click="OnClear"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Button Grid.Row="1" Grid.Column="1" Content="÷" FontSize="48" Margin="4" Click="OnOperator" Tag="Division"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Button Grid.Row="1" Grid.Column="2" Content="×" FontSize="48" Margin="4" Click="OnOperator" Tag="Multiplication"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Button Grid.Row="1" Grid.Column="3" Content="-" FontSize="48" Margin="4" Click="OnOperator" Tag="Subtraction"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+        <Button Grid.Row="2" Grid.Column="3" Grid.RowSpan="2" Content="+" FontSize="48" Margin="4" Click="OnOperator" Tag="Addition"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Button Grid.Row="4" Grid.Column="3" Grid.RowSpan="2" Content="=" FontSize="48" Margin="4" Click="OnEquals"
+            HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+    </Grid>
+</Window>
