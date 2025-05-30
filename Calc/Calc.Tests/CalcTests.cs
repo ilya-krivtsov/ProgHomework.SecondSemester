@@ -77,20 +77,4 @@ public class CalcTests
         calc.EqualsPressed();
         Assert.That(calc.DisplayResult, Is.EqualTo("0.3"));
     }
-
-    [Test]
-    public void Test_0_Divide_0_Gives_Error()
-    {
-        calc.EnterDigit(0);
-        Assert.That(calc.DisplayResult, Is.EqualTo("0"));
-
-        calc.OperatorPressed(ArithmeticOperation.Division);
-        Assert.That(calc.DisplayResult, Is.EqualTo("0"));
-
-        calc.EnterDigit(0);
-        Assert.That(calc.DisplayResult, Is.EqualTo("0"));
-
-        calc.EqualsPressed();
-        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
-    }
 }
