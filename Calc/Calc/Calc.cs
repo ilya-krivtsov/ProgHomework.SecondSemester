@@ -100,6 +100,11 @@ public class Calc : INotifyPropertyChanged
             return;
         }
 
+        if (decimalPointPressed)
+        {
+            return;
+        }
+
         if (state is State.EnteringFirstOperand or State.EnteringNewOperand)
         {
             decimalPointPressed = true;
