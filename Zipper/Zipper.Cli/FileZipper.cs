@@ -1,6 +1,7 @@
 namespace Zipper.Cli;
 
 using System.Buffers;
+using System.Diagnostics;
 
 /// <summary>
 /// Provides methods and properties used to compress and decompress files.
@@ -10,8 +11,13 @@ internal class FileZipper : IDisposable
     private const int BufferSize = 512 * 1024;
     private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Create();
 
+    private readonly string? outputFileName;
+    private readonly string? outputFileNameTempA;
+    private readonly string? outputFileNameTempB;
+
     private readonly Stream readFrom;
     private readonly Stream writeTo;
+    private readonly Stream? writeToAlt;
     private readonly long inputFileSize;
     private readonly byte[] buffer;
 
@@ -28,15 +34,23 @@ internal class FileZipper : IDisposable
         inputFileSize = new FileInfo(inputFilePath).Length;
 
         var inputFile = File.OpenRead(inputFilePath);
-        var outputFile = File.Create(outputFilePath);
 
         if (mode == ZipperMode.Compress)
         {
+            outputFileName = outputFilePath;
+            outputFileNameTempA = Path.GetTempFileName();
+            outputFileNameTempB = Path.GetTempFileName();
+
+            var outputFileA = File.Create(outputFileNameTempA);
+            var outputFileB = File.Create(outputFileNameTempB);
+
             readFrom = inputFile;
-            writeTo = new ZipperStream(outputFile, ZipperStream.MaxBlockSize, mode);
+            writeTo = new ZipperStream(outputFileA, ZipperStream.MaxBlockSize, mode);
+            writeToAlt = new ZipperStream(outputFileB, ZipperStream.MaxBlockSize, mode, useBwt: true);
         }
         else
         {
+            var outputFile = File.Create(outputFilePath);
             readFrom = new ZipperStream(inputFile, ZipperStream.MaxBlockSize, mode);
             writeTo = outputFile;
         }
@@ -73,6 +87,7 @@ internal class FileZipper : IDisposable
         bytesReadFromInput += bytesRead;
 
         writeTo.Write(buffer, 0, bytesRead);
+        writeToAlt?.Write(buffer, 0, bytesRead);
     }
 
     /// <summary>
@@ -84,5 +99,24 @@ internal class FileZipper : IDisposable
 
         readFrom.Dispose();
         writeTo.Dispose();
+        writeToAlt?.Dispose();
+
+        if (outputFileName != null)
+        {
+            Debug.Assert(outputFileNameTempA != null, $"{nameof(outputFileNameTempA)} is null");
+            Debug.Assert(outputFileNameTempB != null, $"{nameof(outputFileNameTempB)} is null");
+
+            var tempLengthA = new FileInfo(outputFileNameTempA).Length;
+            var tempLengthB = new FileInfo(outputFileNameTempB).Length;
+
+            if (tempLengthA < tempLengthB)
+            {
+                File.Move(outputFileNameTempA, outputFileName, true);
+            }
+            else
+            {
+                File.Move(outputFileNameTempB, outputFileName, true);
+            }
+        }
     }
 }

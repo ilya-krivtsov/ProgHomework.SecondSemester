@@ -20,7 +20,7 @@ public class ZipperStream : Stream
     private const int DefaultBlockSize = (MinBlockSize + MaxBlockSize) / 2;
 
     private readonly LZWStream lzwStream;
-    private readonly BWTStream bwtStream;
+    private readonly Stream outerStream;
 
     private readonly Stream stream;
     private readonly ZipperMode mode;
@@ -28,9 +28,15 @@ public class ZipperStream : Stream
 
     private bool disposed;
 
-    /// <inheritdoc cref="ZipperStream(Stream, int, ZipperMode, bool)"/>
+    /// <inheritdoc cref="ZipperStream(Stream, int, ZipperMode, bool, bool)"/>
     public ZipperStream(Stream stream, ZipperMode mode, bool leaveOpen = false)
-        : this(stream, DefaultBlockSize, mode, leaveOpen)
+        : this(stream, DefaultBlockSize, mode, leaveOpen, false)
+    {
+    }
+
+    /// <inheritdoc cref="ZipperStream(Stream, int, ZipperMode, bool, bool)"/>
+    public ZipperStream(Stream stream, ZipperMode mode, bool leaveOpen = false, bool useBwt = false)
+        : this(stream, DefaultBlockSize, mode, leaveOpen, useBwt)
     {
     }
 
@@ -44,9 +50,10 @@ public class ZipperStream : Stream
     /// The value indicating whether <paramref name="stream"/> should be disposed along with this instance,
     /// if <paramref name="mode"/> is <see cref="ZipperMode.Compress"/>.
     /// </param>
+    /// <param name="useBwt">The value indicating whether to use Burrows-Wheeler transformation internally.</param>
     /// <exception cref="ArgumentException"><paramref name="mode"/> is not <see cref="ZipperMode.Compress"/> nor <see cref="ZipperMode.Decompress"/>.</exception>
     /// <exception cref="IndexOutOfRangeException"><paramref name="blockSize"/> is out of range.</exception>
-    public ZipperStream(Stream stream, int blockSize, ZipperMode mode, bool leaveOpen = false)
+    public ZipperStream(Stream stream, int blockSize, ZipperMode mode, bool leaveOpen = false, bool useBwt = false)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(blockSize, MinBlockSize);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(blockSize, MaxBlockSize);
@@ -62,7 +69,14 @@ public class ZipperStream : Stream
         this.stream = stream;
 
         lzwStream = new(stream, blockSize, mode, true);
-        bwtStream = new(lzwStream, bwtBlockSize, mode == ZipperMode.Compress ? BWTMode.Transform : BWTMode.Reconstruct, true);
+        if (useBwt)
+        {
+            outerStream = new BWTStream(lzwStream, bwtBlockSize, mode == ZipperMode.Compress ? BWTMode.Transform : BWTMode.Reconstruct, true);
+        }
+        else
+        {
+            outerStream = lzwStream;
+        }
 
         this.mode = mode;
         this.leaveOpen = leaveOpen;
@@ -127,7 +141,7 @@ public class ZipperStream : Stream
 
         if (mode == ZipperMode.Compress)
         {
-            bwtStream.Flush();
+            outerStream.Flush();
         }
     }
 
@@ -162,7 +176,7 @@ public class ZipperStream : Stream
         EnsureNotClosed();
         EnsureMode(ZipperMode.Compress);
 
-        bwtStream.Write(buffer);
+        outerStream.Write(buffer);
     }
 
     /// <inheritdoc cref="Read(byte[], int, int)"/>
@@ -171,7 +185,7 @@ public class ZipperStream : Stream
         EnsureNotClosed();
         EnsureMode(ZipperMode.Decompress);
 
-        return bwtStream.Read(buffer);
+        return outerStream.Read(buffer);
     }
 
     /// <inheritdoc/>
@@ -184,7 +198,7 @@ public class ZipperStream : Stream
 
         if (disposing)
         {
-            bwtStream.Dispose();
+            outerStream.Dispose();
             lzwStream.Dispose();
 
             if (!leaveOpen)
