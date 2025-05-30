@@ -165,6 +165,10 @@ public class Calc : INotifyPropertyChanged
                 state = State.PressedEquals;
             }
         }
+        else if (state == State.EnteringFirstOperand)
+        {
+            state = State.PressedEquals;
+        }
     }
 
     /// <summary>
