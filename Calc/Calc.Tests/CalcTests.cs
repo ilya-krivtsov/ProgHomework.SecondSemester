@@ -77,4 +77,69 @@ public class CalcTests
         calc.EqualsPressed();
         Assert.That(calc.DisplayResult, Is.EqualTo("0.3"));
     }
+
+    [Test]
+    public void Test_Clear()
+    {
+        calc.EnterDigit(2);
+        Assert.That(calc.DisplayResult, Is.EqualTo("2"));
+
+        calc.OperatorPressed(ArithmeticOperation.Addition);
+        Assert.That(calc.DisplayResult, Is.EqualTo("2"));
+
+        calc.EnterDigit(3);
+        Assert.That(calc.DisplayResult, Is.EqualTo("3"));
+
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("5"));
+
+        calc.Clear();
+        Assert.That(calc.DisplayResult, Is.EqualTo("0"));
+
+        calc.EnterDigit(3);
+        Assert.That(calc.DisplayResult, Is.EqualTo("3"));
+
+        calc.OperatorPressed(ArithmeticOperation.Addition);
+        Assert.That(calc.DisplayResult, Is.EqualTo("3"));
+
+        calc.EnterDigit(4);
+        Assert.That(calc.DisplayResult, Is.EqualTo("4"));
+
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("7"));
+
+        calc.Clear();
+        Assert.That(calc.DisplayResult, Is.EqualTo("0"));
+    }
+
+    [Test]
+    public void Test_DoubleDecimalPoint_DoesNotAddNew_DecimalPoint()
+    {
+        calc.EnterDigit(2);
+        Assert.That(calc.DisplayResult, Is.EqualTo("2"));
+        calc.EnterDecimalPoint();
+        Assert.That(calc.DisplayResult, Is.EqualTo("2."));
+        calc.EnterDecimalPoint();
+        Assert.That(calc.DisplayResult, Is.EqualTo("2."));
+    }
+
+    [Test]
+    public void Test_EnteringDigitsAfter_Equals_SetsResultTo_ThatDigit()
+    {
+        calc.EnterDigit(2);
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("2"));
+        calc.EnterDigit(5);
+        Assert.That(calc.DisplayResult, Is.EqualTo("5"));
+
+        calc.Clear();
+
+        calc.EnterDigit(1);
+        calc.OperatorPressed(ArithmeticOperation.Addition);
+        calc.EnterDigit(2);
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("3"));
+        calc.EnterDigit(5);
+        Assert.That(calc.DisplayResult, Is.EqualTo("5"));
+    }
 }

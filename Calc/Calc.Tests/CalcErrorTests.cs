@@ -23,4 +23,34 @@ public class CalcErrorTests
         calc.EqualsPressed();
         Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
     }
+
+    [Test]
+    public void Test_Error_State_Persists()
+    {
+        calc.EnterDigit(0);
+        calc.OperatorPressed(ArithmeticOperation.Division);
+        calc.EnterDigit(0);
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
+        calc.EnterDecimalPoint();
+        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
+        calc.EnterDigit(4);
+        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
+        calc.OperatorPressed(ArithmeticOperation.Addition);
+        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
+    }
+
+    [Test]
+    public void Test_Error_IsRemoved_AfterClear()
+    {
+        calc.EnterDigit(0);
+        calc.OperatorPressed(ArithmeticOperation.Division);
+        calc.EnterDigit(0);
+        calc.EqualsPressed();
+        Assert.That(calc.DisplayResult, Is.EqualTo("Error"));
+        calc.Clear();
+        Assert.That(calc.DisplayResult, Is.EqualTo("0"));
+    }
 }
