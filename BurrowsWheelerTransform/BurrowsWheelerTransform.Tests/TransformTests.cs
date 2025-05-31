@@ -30,7 +30,7 @@ public class TransformTests
 
         int steps = 16;
         int length = 256;
-        char[] buffer = new char[length];
+        var buffer = new char[length];
 
         for (int i = 0; i < steps; i++)
         {
